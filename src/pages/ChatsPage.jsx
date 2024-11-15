@@ -1,7 +1,10 @@
+import Chat from "../components/Chat";
+
 export default function ChatsPage() {
   return (
     <main>
-      <h1>Chats</h1>
+      <h1>Chats Page</h1>
+      <Chat />
     </main>
   );
 }
