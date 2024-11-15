@@ -16,9 +16,21 @@ export default function Chat() {
     setUserInput(text);
   };
 
+  const handleSubmit = (e) => {
+    try {
+      e.preventDefault();
+      console.log(`Data: ${userInput}`);
+      setUserInput('')
+      
+    } catch (e) {
+      console.error(e);
+      
+    }
+  }
+
   return (
     <div>
-      <form>
+      <form onSubmit={handleSubmit}>
         <label>
           <input
             type="text"
