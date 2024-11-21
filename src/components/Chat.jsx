@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
-export default function Chat() {
+function Chat() {
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
@@ -12,49 +12,45 @@ export default function Chat() {
     inputRef.current.focus();
   }, []);
 
-  // create a new chat on the first render
-  useEffect(() => {
-    const createChat = async () => {
-      try {
-        const res = await axios.post("http://localhost:4000/api/chats");
-        console.log(res.data);
-        setCurrentChat(res.data);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    createChat();
-  }, []);
-
-
+  /**
+   * Handle Change
+   * @param {*} e 
+   */
   const handleChange = (e) => {
-    const text = e.target.value.trim();
-    console.log(text);
-    setUserInput(text);
+    const value = e.target.value;
+    console.log(value);
+    setUserInput(value);
   };
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      let chatId = currentChat;
       console.log(`Data: ${userInput}`);
+
+      // creates a new chat if there is no chatId
+      if (!chatId) {
+        const res = await axios.post("http://localhost:9000/api/chats");
+        console.log(res.data);
+        setCurrentChat(res.data._id); // sets the currentChat to the new chat _id
+        chatId = res.data._id;
+      }
 
       const message = {
         role: "user",
         content: userInput,
       };
-
-      // POST
+      //POST
       const res = await axios.post(
-        `http://localhost:4000/api/chats/${currentChat._id}/message`,
+        `http://localhost:9000/api/chats/${chatId}/message`,
         message,
       );
       console.log(res.data);
 
-      // setMessages([...messages, message]);
+      // setMessages([...messages, message])
       setMessages(res.data.messages);
-
       setUserInput("");
-      // inputRef.current.focus();
+      inputRef.current.focus();
     } catch (e) {
       console.error(e);
     }
@@ -62,17 +58,15 @@ export default function Chat() {
 
   return (
     <div>
-      {/* MESSAGES  */}
       <div>
-        {messages.map((m, i) => (
-          <div key={i}>
+        {messages.map((m, index) => (
+          <div key={index}>
             <p>{m.role}</p>
             <p>{m.content}</p>
           </div>
         ))}
       </div>
 
-      {/* FORM */}
       <form onSubmit={handleSubmit}>
         <label>
           <input
@@ -89,3 +83,5 @@ export default function Chat() {
     </div>
   );
 }
+
+export default Chat;
